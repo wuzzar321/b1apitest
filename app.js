@@ -28,14 +28,14 @@ var config = {
 function signRequest(headers, content) {
     // Order header items
     var orderedHeaders = {};
-    Object.keys(headers).sort().forEach(function(key) {
+    Object.keys(headers).sort().forEach(function (key) {
         orderedHeaders[key] = headers[key];
     });
     console.log("Ordered headers:", orderedHeaders);
 
     // Generate data to sign
     var data = '';
-    Object.keys(orderedHeaders).forEach(function(key) {
+    Object.keys(orderedHeaders).forEach(function (key) {
         data += key.toLowerCase() + orderedHeaders[key];
     });
     data += content;
@@ -60,31 +60,115 @@ function buildRequestHeaders(content) {
     return headers;
 }
 
+// 
+// Create new client
+// 
+
+// function makeRequestToB1() {
+//     var dataToSubmit = {
+//         name: 'Du gaideliai',
+//         locationId: 1
+//     };
+//     var dataToSubmitAsString = JSON.stringify(dataToSubmit);
+//     var headers = buildRequestHeaders(dataToSubmitAsString);
+//     var requestOptions = {
+//         host: 'www.b1.lt',
+//         port: 443,
+//         path: '/api/clients/create',
+//         method: 'POST',
+//         headers: headers
+//     };
+//     var req = https.request(requestOptions, function(res) {
+//         console.log("Response status code:", res.statusCode);
+//         console.log("Response headers:", res.headers);
+//         res.setEncoding('utf8');
+//         res.on('data', function(chunk) {
+//            console.log('Response body:', JSON.parse(chunk));
+//         });
+//     });
+//     req.end(dataToSubmitAsString);
+// }
+
+// 
+// Create purchase request
+// 
+
 function makeRequestToB1() {
     var dataToSubmit = {
-        name: 'Du gaideliai',
-        locationId: 1
+        warehouseId: 1,
+        operationTypeId: 5,
+        supplierId: 31,
+        purchaseDate: "2019-02-12",
+        number: "1234",
+        currencyId: 1,
+        employeeId: 39,
+        items: [
+            {
+                position: 1,
+                warehouseId: 1,
+                itemId: 23,
+                quantity: 3000,
+                vatRate: 2100,
+                priceWithoutVat: 10000,
+                priceWithVat: 12100,
+                priceWithDiscountWithoutVat: 10000,
+                discountRate: 0,
+                discount: 0,
+                discountSum: 0
+            }
+        ]
     };
     var dataToSubmitAsString = JSON.stringify(dataToSubmit);
     var headers = buildRequestHeaders(dataToSubmitAsString);
     var requestOptions = {
         host: 'www.b1.lt',
         port: 443,
-        path: '/api/clients/create',
+        path: '/api/warehouse/purchases/import',
         method: 'POST',
         headers: headers
     };
-    var req = https.request(requestOptions, function(res) {
+    var req = https.request(requestOptions, function (res) {
         console.log("Response status code:", res.statusCode);
         console.log("Response headers:", res.headers);
         res.setEncoding('utf8');
-        res.on('data', function(chunk) {
-           console.log('Response body:', JSON.parse(chunk));
+        res.on('data', function (chunk) {
+            console.log('Response body:', JSON.parse(chunk));
         });
     });
     req.end(dataToSubmitAsString);
 }
 
-makeRequestToB1();
+// 
+// Make search request
+// 
+
+function makeSearchRequestToB1() {
+    var dataToSubmit = {
+        rows: 10,
+        page: 1
+    };
+    var dataToSubmitAsString = JSON.stringify(dataToSubmit);
+    var headers = buildRequestHeaders(dataToSubmitAsString);
+    var requestOptions = {
+        host: 'www.b1.lt',
+        port: 443,
+        path: '/api/reference-book/items/list',
+        method: 'POST',
+        headers: headers
+    };
+    var req = https.request(requestOptions, function (res) {
+        console.log("Response status code:", res.statusCode);
+        console.log("Response headers:", res.headers);
+        res.setEncoding('utf8');
+        res.on('data', function (chunk) {
+            console.log('Response body:', JSON.parse(chunk));
+        });
+    });
+    req.end(dataToSubmitAsString);
+}
+
+
+// makeRequestToB1();
+makeSearchRequestToB1();
 
 module.exports = app;
